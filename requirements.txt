@@ -1,0 +1,11 @@
+django>=3.2,<3.3
+django-dotenv
+psycopg2-binary
+gunicorn
+pint
+typing
+django-htmx
+django-storages
+boto3
+pillow
+requests

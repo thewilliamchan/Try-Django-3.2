@@ -1,0 +1,97 @@
+alerts:
+- rule: DEPLOYMENT_FAILED
+- rule: DOMAIN_FAILED
+databases:
+- engine: PG
+  name: db
+  num_nodes: 1
+  size: db-s-dev-database
+  version: "12"
+envs:
+- key: DISABLE_COLLECTSTATIC
+  scope: RUN_AND_BUILD_TIME
+  value: "1"
+- key: DEBUG
+  scope: RUN_AND_BUILD_TIME
+  value: "0"
+- key: DJANGO_ALLOWED_HOST
+  scope: RUN_AND_BUILD_TIME
+  value: .ondigitalocean.app
+- key: DJANGO_SUPERUSER_EMAIL
+  scope: RUN_AND_BUILD_TIME
+  value: william.wlchan@outlook.com
+- key: DJANGO_SUPERUSER_USERNAME
+  scope: RUN_AND_BUILD_TIME
+  value: william
+- key: DJANGO_SECRET_KEY
+  scope: RUN_AND_BUILD_TIME
+  type: SECRET
+  value: EV[1:VzfGV4uorkpFlR6txGlw0mV7yB+ENgA5:jXQupuD1FbhknhMA3VL4c38GMd5MiA==]
+- key: DJANGO_SUPERUSER_PASSWORD
+  scope: RUN_AND_BUILD_TIME
+  type: SECRET
+  value: EV[1:WfX73huYgzthJPjDbNkaGWVsWkhPkxcA:jacYEn/BXIJ3lweNWQWFg3CaiVh72Q==]
+- key: POSTGRES_DB
+  scope: RUN_AND_BUILD_TIME
+  value: ${db.DATABASE}
+- key: POSTGRES_HOST
+  scope: RUN_AND_BUILD_TIME
+  value: ${db.HOSTNAME}
+- key: POSTGRES_USERNAME
+  scope: RUN_AND_BUILD_TIME
+  value: ${db.USERNAME}
+- key: POSTGRES_PASSWORD
+  scope: RUN_AND_BUILD_TIME
+  value: ${db.PASSWORD}
+- key: POSTGRES_PORT
+  scope: RUN_AND_BUILD_TIME
+  value: ${db.PORT}
+- key: AWS_ACCESS_KEY_ID
+  scope: RUN_AND_BUILD_TIME
+  value: abc123
+- key: AWS_SECRET_ACCESS_KEY
+  scope: RUN_AND_BUILD_TIME
+  value: abc123
+- key: AWS_STORAGE_BUCKET_NAME
+  scope: RUN_AND_BUILD_TIME
+  value: trydjango-bucket
+ingress:
+  rules:
+  - component:
+      name: try-django-32
+    match:
+      path:
+        prefix: /
+jobs:
+- environment_slug: python
+  github:
+    branch: production-1
+    deploy_on_push: true
+    repo: thewilliamchan/Try-Django-3.2
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  kind: PRE_DEPLOY
+  name: django-migrate-job
+  run_command: |-
+    python manage.py migrate --noinput
+    python manage.py createsuperuser --noinput --email hello@teamcfe.com
+  source_dir: /
+name: try-django-3-2-ctl
+region: sgp
+services:
+- environment_slug: python
+  envs:
+  - key: DATABASE_URL
+    scope: RUN_TIME
+    value: ${db.DATABASE_URL}
+  github:
+    branch: production-1
+    deploy_on_push: true
+    repo: thewilliamchan/Try-Django-3.2
+  http_port: 8080
+  instance_count: 1
+  instance_size_slug: basic-xs
+  name: try-django-32
+  run_command: |
+    gunicorn --worker-tmp-dir /dev/shm trydjango.wsgi
+  source_dir: /
