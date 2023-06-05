@@ -48,7 +48,7 @@ jobs:
         run: |
           python manage.py test
       - name: Install doctl
-        users: digitalocean/action-doctl@v2
+        uses: digitalocean/action-doctl@v2
         with:
           token: ${{ secrets.DO_ACCESS_TOKEN }}
       - name: Run a DOCTL command
